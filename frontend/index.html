@@ -1,55 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Insurance Risk Calculator</title>
-    <link rel="stylesheet" href="styles.css">
+  <title>Risk Calculator</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Health Insurance Risk Calculator</h1>
-        <form id="riskForm">
-            <!-- Age -->
-            <label for="age">Age:</label>
-            <input type="number" id="age" name="age" required min="1" max="120">
+  <h1>Risk Calculator</h1>
+  <form id="riskForm">
+    <label for="age">Age:</label>
+    <input type="number" id="age" required><br><br>
 
-            <!-- Height (in cm) -->
-            <label for="height">Height (in cm):</label>
-            <input type="number" id="height" name="height" required min="60">
+    <label for="height">Height (cm):</label>
+    <input type="number" id="height" required><br><br>
 
-            <!-- Weight (in kg) -->
-            <label for="weight">Weight (in kg):</label>
-            <input type="number" id="weight" name="weight" required min="1">
+    <label for="weight">Weight (kg):</label>
+    <input type="number" id="weight" required><br><br>
 
-            <!-- Blood Pressure -->
-            <label for="systolic">Systolic Blood Pressure:</label>
-            <input type="number" id="systolic" name="systolic" required min="50" max="300">
+    <label for="systolic">Systolic BP:</label>
+    <input type="number" id="systolic" required><br><br>
 
-            <label for="diastolic">Diastolic Blood Pressure:</label>
-            <input type="number" id="diastolic" name="diastolic" required min="30" max="200">
+    <label for="diastolic">Diastolic BP:</label>
+    <input type="number" id="diastolic" required><br><br>
 
-            <!-- Family History -->
-            <fieldset>
-                <legend>Family History (Check all that apply):</legend>
-                <label><input type="checkbox" name="familyHistory" value="diabetes"> Diabetes</label>
-                <label><input type="checkbox" name="familyHistory" value="cancer"> Cancer</label>
-                <label><input type="checkbox" name="familyHistory" value="alzheimer"> Alzheimer’s</label>
-            </fieldset>
+    <label>Family History:</label><br>
+    <input type="checkbox" name="familyHistory" value="diabetes"> Diabetes<br>
+    <input type="checkbox" name="familyHistory" value="cancer"> Cancer<br>
+    <input type="checkbox" name="familyHistory" value="alzheimer"> Alzheimer<br><br>
 
-            <!-- Submit Button -->
-            <button type="submit">Calculate Risk</button>
-        </form>
+    <button type="submit">Calculate Risk</button>
+  </form>
 
-        <!-- Results Section -->
-        <div id="result" class="result">
-            <h2>Results</h2>
-            <p>BMI: <span id="bmiResult">-</span></p>
-            <p>Total Risk Score: <span id="riskScore">-</span></p>
-            <p>Risk Category: <span id="riskCategory">-</span></p>
-        </div>
-    </div>
+  <button onclick="wakeUp()">Wake Up Server</button>
+  <button onclick="testCorsFailure()">Test CORS Failure</button>
 
-    <script src="script.js"></script>
+  <h2>Results</h2>
+  <p>BMI: <span id="bmiResult"></span></p>
+  <p>Risk Score: <span id="riskScore"></span></p>
+  <p>Risk Category: <span id="riskCategory"></span></p>
+
+  <script>
+    // Function to wake up the server
+    async function wakeUp() {
+      try {
+        const response = await fetch('https://backendapii-awa8d4fxfnbhgdcd.uaenorth-01.azurewebsites.net/wake-up');
+        const data = await response.json();
+        alert(data.message);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to wake up server');
+      }
+    }
+
+    // Function to test CORS failure
+    async function testCorsFailure() {
+      try {
+        const response = await fetch('https://backendapii-awa8d4fxfnbhgdcd.uaenorth-01.azurewebsites.net/no-cors');
+        const data = await response.json();
+        alert(data.message);
+      } catch (error) {
+        console.error('CORS Error:', error);
+        alert('CORS failure detected!');
+      }
+    }
+
+    // Handle form submission
+    document.getElementById('riskForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Get form inputs
+      const age = document.getElementById('age').value;
+      const height = document.getElementById('height').value;
+      const weight = document.getElementById('weight').value;
+      const systolic = document.getElementById('systolic').value;
+      const diastolic = document.getElementById('diastolic').value;
+      const familyHistory = Array.from(document.querySelectorAll('input[name="familyHistory"]:checked')).map(el => el.value);
+
+      // Validate inputs
+      if (height < 60) {
+        alert('Height must be at least 60 cm.');
+        return;
+      }
+      if (weight <= 0) {
+        alert('Weight must be greater than 0 kg.');
+        return;
+      }
+      if (systolic < 50 || systolic > 300 || diastolic < 30 || diastolic > 200) {
+        alert('Please enter valid blood pressure values.');
+        return;
+      }
+
+      // Send data to backend
+      try {
+        const response = await fetch('https://backendapii-awa8d4fxfnbhgdcd.uaenorth-01.azurewebsites.net/calculate-risk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ age, height, weight, systolic, diastolic, familyHistory }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        // Display results
+        document.getElementById('bmiResult').textContent = result.bmi;
+        document.getElementById('riskScore').textContent = result.totalScore;
+        document.getElementById('riskCategory').textContent = result.riskCategory;
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while calculating risk. Please try again.');
+      }
+    });
+  </script>
 </body>
 </html>
