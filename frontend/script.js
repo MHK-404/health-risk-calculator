@@ -25,7 +25,7 @@ document.getElementById('riskForm').addEventListener('submit', async (e) => {
 
     // Send data to backend
     try {
-        const response = await fetch('backendapii-awa8d4fxfnbhgdcd.uaenorth-01.azurewebsites.net', {
+        const response = await fetch('https://backendapii-awa8d4fxfnbhgdcd.uaenorth-01.azurewebsites.net/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ age, height, weight, systolic, diastolic, familyHistory }),
