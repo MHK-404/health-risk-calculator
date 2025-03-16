@@ -1,15 +1,4 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-
-const app = express();
-const port = 3000;
-
-app.use(cors());
-app.use(bodyParser.json());
-
-// API endpoint to calculate risk
-app.post('/calculate-risk', (req, res) => {
+module.exports = async function (context, req) {
     const { age, height, weight, systolic, diastolic, familyHistory } = req.body;
 
     // Calculate BMI
@@ -27,10 +16,12 @@ app.post('/calculate-risk', (req, res) => {
     const riskCategory = determineRiskCategory(totalScore);
 
     // Send response
-    res.json({ bmi, totalScore, riskCategory });
-});
+    context.res = {
+        status: 200,
+        body: { bmi, totalScore, riskCategory },
+    };
+};
 
-// Helper functions
 function calculateAgePoints(age) {
     if (age < 30) return 0;
     if (age < 45) return 10;
@@ -66,7 +57,3 @@ function determineRiskCategory(totalScore) {
     if (totalScore <= 75) return 'High Risk';
     return 'Uninsurable';
 }
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
