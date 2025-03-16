@@ -38,29 +38,8 @@
   <p>Risk Category: <span id="riskCategory"></span></p>
 
   <script>
-    // Function to wake up the server
-    async function wakeUp() {
-      try {
-        const response = await fetch('https://backendapii-awa8d4fxfnbhgdcd.uaenorth-01.azurewebsites.net/wake-up');
-        const data = await response.json();
-        alert(data.message);
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to wake up server');
-      }
-    }
-
-    // Function to test CORS failure
-    async function testCorsFailure() {
-      try {
-        const response = await fetch('https://backendapii-awa8d4fxfnbhgdcd.uaenorth-01.azurewebsites.net/no-cors');
-        const data = await response.json();
-        alert(data.message);
-      } catch (error) {
-        console.error('CORS Error:', error);
-        alert('CORS failure detected!');
-      }
-    }
+   
+   
 
     // Handle form submission
     document.getElementById('riskForm').addEventListener('submit', async (e) => {
@@ -90,7 +69,7 @@
 
       // Send data to backend
       try {
-        const response = await fetch('https://backendapii-awa8d4fxfnbhgdcd.uaenorth-01.azurewebsites.net/calculate-risk', {
+        const response = await fetch('https://backendsprint4-g8aka0d3d8a7bhdg.uaenorth-01.azurewebsites.net/calculate-risk', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ age, height, weight, systolic, diastolic, familyHistory }),
