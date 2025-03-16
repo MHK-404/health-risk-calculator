@@ -25,7 +25,7 @@ document.getElementById('riskForm').addEventListener('submit', async (e) => {
 
     // Send data to backend
     try {
-        const response = await fetch('https://proud-moss-014d74100.6.azurestaticapps.net', {
+        const response = await fetch(' http://localhost:7071/api/calculate-risk', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ age, height, weight, systolic, diastolic, familyHistory }),
